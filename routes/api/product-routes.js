@@ -1,6 +1,9 @@
 const router = require('express').Router();
 const { Product, Category, Tag, ProductTag } = require('../../models');
 
+// The `/api/products` endpoint
+
+// get all products
 router.get('/', (req, res) => {
   Product.findAll()
     .then((allProducts) => {
@@ -14,8 +17,8 @@ router.get('/', (req, res) => {
 
 router.get('/:id', (req, res) => {
   const productId = parseInt(req.params.id);
-  Product.findByPk(productId)  
-  .then((product) => {
+  Product.findByPk(productId)
+    .then((product) => {
       if (product) {
         res.json(product);
       } else {
@@ -108,5 +111,6 @@ router.delete('/:id', (req, res) => {
       res.status(500).json({ message: 'Internal server error' });
     });
 });
+
 
 module.exports = router;

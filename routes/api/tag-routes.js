@@ -1,8 +1,9 @@
 const router = require('express').Router();
 const { Tag, Product, ProductTag } = require('../../models');
 
+
 router.get('/', (req, res) => {
-  Product.findAll()
+  Tag.findAll()
     .then((allTags) => {
       res.json(allTags);
     })
@@ -13,8 +14,8 @@ router.get('/', (req, res) => {
 });
 
 router.get('/:id', (req, res) => {
-  const tagId = parseInt(req.params.id)
-  fetchTag(tagId)
+  const tagId = parseInt(req.params.id);
+  Tag.findByPk(tagId)
     .then((tag) => {
       if (tag) {
         res.json(tag);
@@ -33,12 +34,12 @@ router.post('/', (req, res) => {
   Tag.create(newTag)
     .then((tag) => {
       if (newTag.tagIds && newTag.tagIds.length) {
-        const TagIdArr = newTag.tagIds.map((tag_id) => {
+        const tagIdArr = newTag.tagIds.map((tag_id) => {
           return {
             tag_id,
           };
         });
-        return ProductTag.bulkCreate(TagIdArr);
+        return Tag.bulkCreate(tagIdArr);
       }
       res.status(201).json(tag);
     })
@@ -59,23 +60,22 @@ router.put('/:id', (req, res) => {
 
         Tag.findAll({
           where: { tag_id: req.params.id }
-        }).then((tags) => {
-          const tagIds = tags.map(({ tag_id }) => tag_id);
+        }).then((productTags) => {
+          const tagIds = tagIds.map(({ tag_id }) => tag_id);
           const newTags = req.body.tagIds
             .filter((tag_id) => !tagIds.includes(tag_id))
             .map((tag_id) => {
               return {
-                product_id: req.params.id,
                 tag_id,
               };
             });
 
-          const productTagsToRemove = productTags
+          const tagsToRemove = productTags
             .filter(({ tag_id }) => !req.body.tagIds.includes(tag_id))
             .map(({ id }) => id);
           return Promise.all([
-            ProductTag.destroy({ where: { id: productTagsToRemove } }),
-            ProductTag.bulkCreate(newProductTags),
+            Tag.destroy({ where: { id: tagsToRemove } }),
+            Tag.bulkCreate(newTags),
           ]);
         });
       }
@@ -88,11 +88,11 @@ router.put('/:id', (req, res) => {
 });
 
 router.delete('/:id', (req, res) => {
-  const tagId = parseInt(req.params.id);
+  const tagIds = parseInt(req.params.id);
 
-  Product.destroy({
+  Tag.destroy({
     where: {
-      id: tagId,
+      id: tagIds,
     }
   })
     .then((rowsDeleted) => {
