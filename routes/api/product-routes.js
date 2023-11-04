@@ -13,8 +13,9 @@ router.get('/', (req, res) => {
 });
 
 router.get('/:id', (req, res) => {
-  const productId = parseInt(req.params.id)
-    .then((product) => {
+  const productId = parseInt(req.params.id);
+  Product.findByPk(productId)  
+  .then((product) => {
       if (product) {
         res.json(product);
       } else {

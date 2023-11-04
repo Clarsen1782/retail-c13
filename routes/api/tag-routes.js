@@ -1,8 +1,6 @@
 const router = require('express').Router();
 const { Tag, Product, ProductTag } = require('../../models');
 
-// The `/api/tags` endpoint
-
 router.get('/', (req, res) => {
   Product.findAll()
     .then((allTags) => {
@@ -37,11 +35,10 @@ router.post('/', (req, res) => {
       if (newTag.tagIds && newTag.tagIds.length) {
         const TagIdArr = newTag.tagIds.map((tag_id) => {
           return {
-            product_id: product.id,
             tag_id,
           };
         });
-        return Tag.bulkCreate(TagIdArr);
+        return ProductTag.bulkCreate(TagIdArr);
       }
       res.status(201).json(tag);
     })
