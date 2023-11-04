@@ -4,31 +4,31 @@ const { Category, Product } = require('../../models');
 
 router.get('/', (req, res) => {
   Category.findAll()
-  .then((allCategories) => {
-    res.json(allCategories);
-  })
-  .catch((error) =>{
-    console.error(error);
-    res.status(500).json({message: 'Internal server error'});
-  });
+    .then((allCategories) => {
+      res.json(allCategories);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).json({ message: 'Internal server error' });
+    });
 });
 
 router.get('/:id', (req, res) => {
-  const categoryId = parseInt(req.params.id); 
-  const category = categories.find((category) => category.id === categoryId); 
+  const categoryId = parseInt(req.params.id);
+  const category = categories.find((category) => category.id === categoryId);
 
   if (category) {
     res.json(category);
   } else {
-    res.status(404).json({ message: 'Category not found'});
+    res.status(404).json({ message: 'Category not found' });
   }
 });
 
 router.post('/', (req, res) => {
   const newCategory = req.body;
-  
+
   if (!newCategory || !newCategory.name) {
-    res.status(400).json({ message: 'Category name is required'});
+    res.status(400).json({ message: 'Category name is required' });
   }
   const newCategoryId = categories.length + 1;
   const category = { id: newCategoryId, name: newCategory.name };

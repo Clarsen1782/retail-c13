@@ -3,33 +3,32 @@ const { Product, Category, Tag, ProductTag } = require('../../models');
 
 router.get('/', (req, res) => {
   Product.findAll()
-  .then((allProducts) => {
-    res.json(allProducts);
-  })
-  .catch((error) =>{
-    console.error(error);
-    res.status(500).json({message: 'Internal server error'});
-  });
+    .then((allProducts) => {
+      res.json(allProducts);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).json({ message: 'Internal server error' });
+    });
 });
 
 router.get('/:id', (req, res) => {
-  const productId = parseInt(req.params.id);
-  .then((product) => {
-    if (product) {
-      res.json(product);
-    }else {
-      res.status(404).json({message: 'Product not found'});
-    }
-  })
-  .catch((error) => {
+  const productId = parseInt(req.params.id)
+    .then((product) => {
+      if (product) {
+        res.json(product);
+      } else {
+        res.status(404).json({ message: 'Product not found' });
+      }
+    })
+    .catch((error) => {
       console.error(error);
-      res.status(500).json({message:'Internal server error'});
+      res.status(500).json({ message: 'Internal server error' });
     });
 });
 
 router.post('/', (req, res) => {
   const newProduct = req.body;
-
   Product.create(newProduct)
     .then((product) => {
       if (newProduct.tagIds && newProduct.tagIds.length) {
@@ -57,23 +56,23 @@ router.put('/:id', (req, res) => {
   })
     .then((product) => {
       if (req.body.tagIds && req.body.tagIds.length) {
-        
+
         ProductTag.findAll({
           where: { product_id: req.params.id }
         }).then((productTags) => {
           const productTagIds = productTags.map(({ tag_id }) => tag_id);
           const newProductTags = req.body.tagIds
-          .filter((tag_id) => !productTagIds.includes(tag_id))
-          .map((tag_id) => {
-            return {
-              product_id: req.params.id,
-              tag_id,
-            };
-          });
+            .filter((tag_id) => !productTagIds.includes(tag_id))
+            .map((tag_id) => {
+              return {
+                product_id: req.params.id,
+                tag_id,
+              };
+            });
 
           const productTagsToRemove = productTags
-          .filter(({ tag_id }) => !req.body.tagIds.includes(tag_id))
-          .map(({ id }) => id);
+            .filter(({ tag_id }) => !req.body.tagIds.includes(tag_id))
+            .map(({ id }) => id);
           return Promise.all([
             ProductTag.destroy({ where: { id: productTagsToRemove } }),
             ProductTag.bulkCreate(newProductTags),
