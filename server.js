@@ -1,8 +1,6 @@
 const express = require('express');
 const routes = require('./routes');
-const { Sequelize } = require('sequelize');
-
-
+// import sequelize connection
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -12,15 +10,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(routes);
 
-const sequelize = new Sequelize('ecommerce_db', 'root', 'password', {
-  host: 'localhost',
-  dialect: 'mysql',
-});
-
-sequelize.sync().then(() => {
-  app.listen(PORT, () => {
-    console.log(`App listening on port ${PORT}!`);
-  });
-}).catch((error) => {
-  console.error('Error synchronizing models with the database:', error);
+// sync sequelize models to the database, then turn on the server
+app.listen(PORT, () => {
+  console.log(`App listening on port ${PORT}!`);
 });
